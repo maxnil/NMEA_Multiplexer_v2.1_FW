@@ -18,14 +18,22 @@
 #include "freertos_usart_serial.h"
 #include "task.h"
 
+/* Tasks */
+#include "tasks/timer_task.h"
+#include "tasks/task_queues.h"
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ DEFINES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 /* The priorities at which various tasks will get created. */
 //#define SOFTWARE_TIMER_RATE		(200 / portTICK_PERIOD_MS)
+#define SOFTWARE_TIMER_RATE		(100)
 
 #define DBG_WELCOME_HEADER \
+"\r\n" \
+"\r\n" \
 "------------------------------------\r\n" \
-"-- NMEA_Multiplexer_RTOS 2017 " SW_VERSION "      --\r\n" \
+"-- NMEA Multiplexer v2.0          --\r\n" \
+"-- RTOS FW Ver: " SW_VERSION "            --\r\n" \
 "-- Compiled: "__DATE__" "__TIME__" --\r\n" \
 "------------------------------------\r\n" \
 "--  ## DEBUG OUTPUT INTERFACE ##  --\r\n" \
@@ -60,13 +68,16 @@ int main (void)
 #ifdef CONF_NMEA_MUX_ENABLE_DEBUG_CONSOLE
 	/* Initialize Debug Console */
 	const usart_serial_options_t console_uart_options = {
-		.baudrate     = CONF_UART_CONSOLE_BAUDRATE,
-		.paritytype   = CONF_UART_CONSOLE_PARITY
+		.baudrate	= CONF_UART_CONSOLE_BAUDRATE,
+		.paritytype	= CONF_UART_CONSOLE_PARITY,
+		.charlength	= CONF_UART_CONSOLE_CHAR_LENGTH,
+		.stopbits	= CONF_UART_CONSOLE_STOP_BITS
 	};
 
 	stdio_serial_init(CONF_UART_CONSOLE, &console_uart_options);
 	printf(DBG_WELCOME_HEADER);			// Print welcome message on Debug UART
 #endif
+
 
 #ifdef CONF_NMEA_MUX_ENABLE_FREERTOS_NMEA_USART
 	/* Initialize FreeRTOS USART drivers */
@@ -116,9 +127,18 @@ int main (void)
 	create_usb_cdc_tasks();
 #endif
 
-	printf("Starting all RTOS tasks\n");
-//	vTaskStartScheduler();	// This function call should never return
+	printf("Starting all RTOS tasks\r\n");
+	vTaskStartScheduler();	// This function call should never return
 	
-	printf("###ERROR: vTaskStartScheduler() failed\n");
+	printf("###ERROR: vTaskStartScheduler() failed\r\n");
+	while(1) {
+		LED_Toggle(PORT_1_ERR_LED_PIN);
+		LED_Toggle(PORT_2_ERR_LED_PIN);
+		LED_Toggle(PORT_3_ERR_LED_PIN);
+		LED_Toggle(PORT_4_ERR_LED_PIN);
+		LED_Toggle(PORT_5_ERR_LED_PIN);
+		delay_ms(250);
+	}
+	
 	for( ;; );
 }
