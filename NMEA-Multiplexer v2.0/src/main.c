@@ -9,6 +9,7 @@
 
 #include <asf.h>
 #include "services/led.h"
+#include "services/nmea_func.h"
 #include "config/conf_nmea_mux.h"
 #include "application_hooks.h"
 
@@ -19,14 +20,15 @@
 #include "task.h"
 
 /* Tasks */
-#include "tasks/timer_task.h"
+#include "tasks/nmea_port_tasks.h"
+#include "tasks/bt_task.h"
 #include "tasks/task_queues.h"
+#include "tasks/timer_task.h"
+#include "tasks/USB_CDC_tasks.h"
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ DEFINES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-/* The priorities at which various tasks will get created. */
-//#define SOFTWARE_TIMER_RATE		(200 / portTICK_PERIOD_MS)
-#define SOFTWARE_TIMER_RATE		(100)
+#define SOFTWARE_TIMER_RATE		(200 / portTICK_PERIOD_MS)
 
 #define DBG_WELCOME_HEADER \
 "\r\n" \
@@ -44,6 +46,8 @@
 
 int main (void)
 {
+	int i;
+	
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// Initialize PLL and clocks
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -80,40 +84,104 @@ int main (void)
 
 
 #ifdef CONF_NMEA_MUX_ENABLE_FREERTOS_NMEA_USART
-	/* Initialize FreeRTOS USART drivers */
-	uint8_t *nmea_rx_buffer;
-	configASSERT(nmea_rx_buffer = (uint8_t*)pvPortMalloc(CONF_NMEA_MUX_NMEA_RX_BUFFER_SIZE));
-
-	freertos_peripheral_options_t nmea_periph_opt = {
-		.receive_buffer = nmea_rx_buffer,
-		.receive_buffer_size = CONF_NMEA_MUX_NMEA_RX_BUFFER_SIZE,
-		.interrupt_priority = configLIBRARY_LOWEST_INTERRUPT_PRIORITY - 1,
-		.operation_mode = USART_RS232,
-		.options_flags = WAIT_RX_COMPLETE | WAIT_TX_COMPLETE
-	};
-
+	// Same settings for all NMEA ports
 	sam_usart_opt_t nmea_usart_opt = {
-		.baudrate = CONF_UART_NMEA_PORT_BAUDRATE,
-		.char_length = CONF_UART_NMEA_PORT_CHAR_LENGTH,
-		.parity_type = CONF_UART_NMEA_PORT_PARITY,
-		.stop_bits = CONF_UART_NMEA_PORT_STOP_BITS,
-		.channel_mode = US_MR_CHMODE_NORMAL,
-		.irda_filter = 0
+		.baudrate		= CONF_UART_NMEA_PORT_BAUDRATE,
+		.char_length	= CONF_UART_NMEA_PORT_CHAR_LENGTH,
+		.parity_type	= CONF_UART_NMEA_PORT_PARITY,
+		.stop_bits		= CONF_UART_NMEA_PORT_STOP_BITS,
+		.channel_mode	= US_MR_CHMODE_NORMAL,  //  US_MR_USART_MODE_HW_HANDSHAKING
+		.irda_filter	= 0
 	};
 
+	// Peripheral settings
+	freertos_peripheral_options_t nmea_periph_opt = {
+		.receive_buffer			= NULL,  // Will be set later
+		.receive_buffer_size	= CONF_NMEA_MUX_NMEA_RX_BUFFER_SIZE,
+		.interrupt_priority		= configLIBRARY_LOWEST_INTERRUPT_PRIORITY - 1,
+		.operation_mode			= USART_RS232,
+		.options_flags			= WAIT_RX_COMPLETE | WAIT_TX_COMPLETE
+	};
+	
+	// NMEA Port #1
+	configASSERT(nmea_periph_opt.receive_buffer = (uint8_t*)pvPortMalloc(CONF_NMEA_MUX_NMEA_RX_BUFFER_SIZE));
 	configASSERT(freertos_usart_serial_init(CONF_UART_NMEA_PORT_1, &nmea_usart_opt, &nmea_periph_opt));
+
+	// NMEA Port #2
+	configASSERT(nmea_periph_opt.receive_buffer = (uint8_t*)pvPortMalloc(CONF_NMEA_MUX_NMEA_RX_BUFFER_SIZE));
+	configASSERT(freertos_usart_serial_init(CONF_UART_NMEA_PORT_2, &nmea_usart_opt, &nmea_periph_opt));
+
+	// NMEA Port #3
+	configASSERT(nmea_periph_opt.receive_buffer = (uint8_t*)pvPortMalloc(CONF_NMEA_MUX_NMEA_RX_BUFFER_SIZE));
+	configASSERT(freertos_usart_serial_init(CONF_UART_NMEA_PORT_3, &nmea_usart_opt, &nmea_periph_opt));
+
+	// NMEA Port #4
+	configASSERT(nmea_periph_opt.receive_buffer = (uint8_t*)pvPortMalloc(CONF_NMEA_MUX_NMEA_RX_BUFFER_SIZE));
+	configASSERT(freertos_usart_serial_init(CONF_UART_NMEA_PORT_4, &nmea_usart_opt, &nmea_periph_opt));
+
+	// NMEA Port #5
+	configASSERT(nmea_periph_opt.receive_buffer = (uint8_t*)pvPortMalloc(CONF_NMEA_MUX_NMEA_RX_BUFFER_SIZE));
+	configASSERT(freertos_usart_serial_init(CONF_UART_NMEA_PORT_5, &nmea_usart_opt, &nmea_periph_opt));
 #endif
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+#ifdef CONF_NMEA_MUX_ENABLE_FREERTOS_BT_USART
+	// BlueTooth port settings
+	sam_usart_opt_t bt_usart_opt = {
+		.baudrate		= CONF_UART_BT_BAUDRATE,
+		.char_length	= CONF_UART_BT_CHAR_LENGTH,
+		.parity_type	= CONF_UART_BT_PARITY,
+		.stop_bits		= CONF_UART_BT_STOP_BITS,
+		.channel_mode	= US_MR_CHMODE_NORMAL,  //  US_MR_USART_MODE_HW_HANDSHAKING
+		.irda_filter	= 0
+	};
+
+	// BlueTooth port settings
+	freertos_peripheral_options_t bt_periph_opt = {
+		.receive_buffer			= NULL,			// For now...
+		.receive_buffer_size	= CONF_NMEA_MUX_BT_RX_BUFFER_SIZE,
+		.interrupt_priority		= configLIBRARY_LOWEST_INTERRUPT_PRIORITY - 1,
+		.operation_mode			= USART_RS232,
+		.options_flags			= WAIT_RX_COMPLETE | WAIT_TX_COMPLETE
+	};
+
+	// BlueTooth UART
+	configASSERT(bt_periph_opt.receive_buffer = (uint8_t*)pvPortMalloc(CONF_NMEA_MUX_BT_RX_BUFFER_SIZE));
+	configASSERT(freertos_usart_serial_init(CONF_UART_BT, &bt_usart_opt, &bt_periph_opt));
+#endif
+
+	
+	for (i = 0; i < 5; i++) {
+		nmea_search_tree[i] = nmea_tree_init();
+		nmea_tree_add(nmea_search_tree[i], "$GPGSV,", 0x03);
+		nmea_tree_add(nmea_search_tree[i], "$GPGLL,", 0x06);
+		nmea_tree_add(nmea_search_tree[i], "$NISSE,", 0x0F);
+	}
+
+	nmea_str_node_t* nmea_str_node;
+	nmea_str_node = nmea_tree_get_list(nmea_search_tree[0]);
+	while (nmea_str_node != NULL) {
+		printf("nmea_str_node %p %s 0x%.2X\n\r", nmea_str_node, nmea_str_node->str, nmea_str_node->port_mask);
+		nmea_str_node = nmea_str_node->next;
+	}
 
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// Create tasks
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	
 	/* Create Task Queues */
-//	create_task_queues();
+	create_task_queues();
 
-#ifdef CONF_NMEA_ENABLE_PORT_1_TASKS
-	/* Create NMEA Port 1 tasks */
-	create_nmea_port_1_tasks();
+
+#ifdef CONF_NMEA_MUX_ENABLE_NMEA_PORT_TASKS
+	/* Create NMEA Port 1-5 tasks */
+	create_nmea_port_tasks();
+#endif
+
+
+#ifdef CONF_NMEA_MUX_ENABLE_BT_TASK
+	/* Create BT tasks */
+	create_bt_task();
 #endif
 
 
@@ -121,6 +189,7 @@ int main (void)
 	/* Create Timer task */
 	create_timer_task(SOFTWARE_TIMER_RATE);
 #endif
+
 
 #ifdef CONF_NMEA_MUX_ENABLE_USB_CDC_TASK
 	/* Create USB CDC tasks */

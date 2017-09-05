@@ -11,12 +11,10 @@
 
 #include "queue.h"
 
-#if 0
-extern QueueHandle_t command_queue;
-extern QueueHandle_t data_channel_queue;
-extern QueueHandle_t response_queue;
-#endif
-int create_task_queues(void);
+extern QueueHandle_t led_queue;
+extern QueueHandle_t nmea_tx_queue[6];
+extern QueueHandle_t nmea_usb_rx_queue;
 
+void create_task_queues(void);
 
 #endif /* TASK_QUEUES_H_ */

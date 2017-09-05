@@ -111,6 +111,15 @@
 #define configUSE_COUNTING_SEMAPHORES			1
 #define configUSE_TICKLESS_IDLE					0
 
+#define CONF_FREERTOS_USE_USART0
+#define CONF_FREERTOS_USE_USART1
+#define CONF_FREERTOS_USE_USART2
+#define CONF_FREERTOS_USE_USART3
+#define CONF_FREERTOS_USE_USART4
+#define CONF_FREERTOS_USE_USART5
+#define CONF_FREERTOS_USE_USART6
+
+
 /* Run time stats gathering definitions. */
 void vConfigureTimerForRunTimeStats( void );
 uint32_t ulGetRunTimeCounterValue( void );

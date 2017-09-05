@@ -11,21 +11,19 @@
 
 #include "task_queues.h"
 
-//QueueHandle_t command_queue;
-//QueueHandle_t data_channel_queue;
-//QueueHandle_t response_queue;
+QueueHandle_t led_queue;
+QueueHandle_t nmea_tx_queue[6];
+QueueHandle_t nmea_usb_rx_queue;
 
-int create_task_queues(void) {
 
-#if 0
+void create_task_queues(void) {
+	int i;
+	
 	/* Create CLI Response and Data Channel queues */
-	command_queue = xQueueCreate(10, sizeof(uint8_t*));
-	data_channel_queue = xQueueCreate(10, sizeof(uint8_t*));
-	response_queue = xQueueCreate(10, sizeof(uint8_t*));
+	led_queue = xQueueCreate(20, sizeof(uint8_t*));
+	nmea_usb_rx_queue = xQueueCreate(10, sizeof(uint8_t*));
 
-	configASSERT(command_queue);
-	configASSERT(response_queue);
-	configASSERT(data_channel_queue);
-#endif	
-	return 0;
+	for (i = 0; i < 6; i++) {
+		nmea_tx_queue[i] = xQueueCreate(10, sizeof(int8_t*));
+	}
 }

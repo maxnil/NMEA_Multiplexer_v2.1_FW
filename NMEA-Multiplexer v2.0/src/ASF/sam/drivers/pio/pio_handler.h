@@ -1,9 +1,9 @@
 /**
  * \file
  *
- * \brief SAMG clock configuration.
+ * \brief Parallel Input/Output (PIO) interrupt handler for SAM.
  *
- * Copyright (c) 2014-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2011-2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -44,45 +44,26 @@
  * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
-#ifndef CONF_CLOCK_H_INCLUDED
-#define CONF_CLOCK_H_INCLUDED
+#ifndef PIO_HANDLER_H_INCLUDED
+#define PIO_HANDLER_H_INCLUDED
 
-// ===== System Clock (MCK) Source Options
-#define CONFIG_SYSCLK_SOURCE        SYSCLK_SRC_PLLACK
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-// ===== System Clock (MCK) Prescaler Options   (Fmck = Fsys / (SYSCLK_PRES))
-#define CONFIG_SYSCLK_PRES          SYSCLK_PRES_1
-//#define CONFIG_SYSCLK_PRES          SYSCLK_PRES_2
-//#define CONFIG_SYSCLK_PRES          SYSCLK_PRES_3
-//#define CONFIG_SYSCLK_PRES          SYSCLK_PRES_4
-//#define CONFIG_SYSCLK_PRES          SYSCLK_PRES_8
-//#define CONFIG_SYSCLK_PRES          SYSCLK_PRES_16
-//#define CONFIG_SYSCLK_PRES          SYSCLK_PRES_32
-//#define CONFIG_SYSCLK_PRES          SYSCLK_PRES_64
+void pio_handler_process(Pio *p_pio, uint32_t ul_id);
+void pio_handler_set_priority(Pio *p_pio, IRQn_Type ul_irqn, uint32_t ul_priority);
+uint32_t pio_handler_set(Pio *p_pio, uint32_t ul_id, uint32_t ul_mask,
+		uint32_t ul_attr, void (*p_handler) (uint32_t, uint32_t));
+uint32_t pio_handler_set_pin(uint32_t ul_pin, uint32_t ul_flag,
+		void (*p_handler) (uint32_t, uint32_t));
 
-// ===== PLL0 (A) Options   (Fpll = (Fclk * PLL_mul) / PLL_div)
-// Use mul and div effective values here.
-#define CONFIG_PLL0_SOURCE          PLL_SRC_SLCK_XTAL
-#define CONFIG_PLL0_MUL             1500
-#define CONFIG_PLL0_DIV             1
+#if (SAM3S || SAM4S || SAM4E)
+void pio_capture_handler_set(void (*p_handler)(Pio *));
+#endif
 
-// ===== PLL1 (B) Options   (Fpll = (Fclk * PLL_mul) / PLL_div)
-// Use mul and div effective values here.
-#define CONFIG_PLL1_SOURCE          PLL_SRC_SLCK_XTAL
-#define CONFIG_PLL1_MUL             1465
-#define CONFIG_PLL1_DIV             1
+#ifdef __cplusplus
+}
+#endif
 
-// ===== USB Clock Source Options   (Fusb = FpllX / USB_div)
-// Use div effective value here.
-#define CONFIG_USBCLK_SOURCE        USBCLK_SRC_PLL1
-#define CONFIG_USBCLK_DIV           1
-
-// ===== Target frequency (System clock)
-// - External 3crystal frequency: 32768
-// - System clock source: SLCK RC
-// - System clock prescaler: 1 (divided by 1)
-// - PLLA source: SLCK_RC
-// - PLLA output: SLCK_RC * 1500 / 1
-// - System clock: SLCK_RC * 1500 / 1 / 1 = 48MHz
-
-#endif /* CONF_CLOCK_H_INCLUDED */
+#endif /* PIO_HANDLER_H_INCLUDED */
