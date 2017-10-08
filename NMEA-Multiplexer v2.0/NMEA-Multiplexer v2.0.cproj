@@ -32,9 +32,10 @@
           <option id="common.boards" value="Add" config="" content-id="Atmel.ASF" />
           <option id="common.services.delay" value="Add" config="" content-id="Atmel.ASF" />
           <option id="common.services.ioport" value="Add" config="" content-id="Atmel.ASF" />
+          <option id="common.services.usb.class.device" value="Add" config="cdc" content-id="Atmel.ASF" />
           <option id="common.utils.stdio.stdio_serial" value="Add" config="" content-id="Atmel.ASF" />
           <option id="sam.drivers.pdc" value="Add" config="" content-id="Atmel.ASF" />
-          <option id="common.services.usb.class.device" value="Add" config="cdc" content-id="Atmel.ASF" />
+          <option id="sam.services.flash" value="Add" config="" content-id="Atmel.ASF" />
           <option id="sam.utils.linker_scripts" value="Add" config="" content-id="Atmel.ASF" />
         </options>
         <configurations>
@@ -267,6 +268,8 @@
           <file path="src/ASF/sam/drivers/pio/pio_handler.h" framework="" version="3.34.1" source="sam\drivers\pio\pio_handler.h" changed="False" content-id="Atmel.ASF" />
           <file path="src/ASF/sam/drivers/udp/udp_device.c" framework="" version="3.34.1" source="sam\drivers\udp\udp_device.c" changed="False" content-id="Atmel.ASF" />
           <file path="src/ASF/sam/drivers/udp/udp_device.h" framework="" version="3.34.1" source="sam\drivers\udp\udp_device.h" changed="False" content-id="Atmel.ASF" />
+          <file path="src/ASF/sam/services/flash_efc/flash_efc.c" framework="" version="3.34.1" source="sam\services\flash_efc\flash_efc.c" changed="False" content-id="Atmel.ASF" />
+          <file path="src/ASF/sam/services/flash_efc/flash_efc.h" framework="" version="3.34.1" source="sam\services\flash_efc\flash_efc.h" changed="False" content-id="Atmel.ASF" />
         </files>
         <documentation help="http://asf.atmel.com/docs/3.34.1/common.applications.user_application.user_board.samg55j19/html/index.html" />
         <offline-documentation help="" />
@@ -297,7 +300,7 @@
     <custom>
       <ToolOptions>
         <InterfaceProperties>
-          <SwdClock>2500000</SwdClock>
+          <SwdClock>2000000</SwdClock>
         </InterfaceProperties>
         <InterfaceName>
         </InterfaceName>
@@ -361,6 +364,7 @@
       <Value>../src/ASF/common/services/usb/class/cdc/device</Value>
       <Value>../src/ASF/common/services/usb/udc</Value>
       <Value>../src/ASF/sam/drivers/udp</Value>
+      <Value>../src/ASF/sam/services/flash_efc</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
   <armgcc.compiler.optimization.level>Optimize for size (-Os)</armgcc.compiler.optimization.level>
@@ -416,6 +420,7 @@
       <Value>../src/ASF/common/services/usb/class/cdc/device</Value>
       <Value>../src/ASF/common/services/usb/udc</Value>
       <Value>../src/ASF/sam/drivers/udp</Value>
+      <Value>../src/ASF/sam/services/flash_efc</Value>
     </ListValues>
   </armgcc.assembler.general.IncludePaths>
   <armgcc.preprocessingassembler.general.AssemblerFlags>-DARM_MATH_CM4=true -DBOARD=USER_BOARD -Dprintf=iprintf -Dscanf=iscanf -DUDD_ENABLE</armgcc.preprocessingassembler.general.AssemblerFlags>
@@ -454,6 +459,7 @@
       <Value>../src/ASF/common/services/usb/class/cdc/device</Value>
       <Value>../src/ASF/common/services/usb/udc</Value>
       <Value>../src/ASF/sam/drivers/udp</Value>
+      <Value>../src/ASF/sam/services/flash_efc</Value>
     </ListValues>
   </armgcc.preprocessingassembler.general.IncludePaths>
 </ArmGcc>
@@ -516,6 +522,7 @@
       <Value>../src/ASF/common/services/usb/udc</Value>
       <Value>../src/ASF/sam/drivers/udp</Value>
       <Value>../src/ASF/thirdparty/FreeRTOS-8.2.3/Source</Value>
+      <Value>../src/ASF/sam/services/flash_efc</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
   <armgcc.compiler.optimization.level>Optimize (-O1)</armgcc.compiler.optimization.level>
@@ -573,6 +580,7 @@
       <Value>../src/ASF/common/services/usb/class/cdc/device</Value>
       <Value>../src/ASF/common/services/usb/udc</Value>
       <Value>../src/ASF/sam/drivers/udp</Value>
+      <Value>../src/ASF/sam/services/flash_efc</Value>
     </ListValues>
   </armgcc.assembler.general.IncludePaths>
   <armgcc.assembler.debugging.DebugLevel>Default (-g)</armgcc.assembler.debugging.DebugLevel>
@@ -612,6 +620,7 @@
       <Value>../src/ASF/common/services/usb/class/cdc/device</Value>
       <Value>../src/ASF/common/services/usb/udc</Value>
       <Value>../src/ASF/sam/drivers/udp</Value>
+      <Value>../src/ASF/sam/services/flash_efc</Value>
     </ListValues>
   </armgcc.preprocessingassembler.general.IncludePaths>
   <armgcc.preprocessingassembler.debugging.DebugLevel>Default (-Wa,-g)</armgcc.preprocessingassembler.debugging.DebugLevel>
@@ -658,6 +667,8 @@
     <Folder Include="src\ASF\sam\drivers\supc\" />
     <Folder Include="src\ASF\sam\drivers\udp\" />
     <Folder Include="src\ASF\sam\drivers\usart\" />
+    <Folder Include="src\ASF\sam\services\" />
+    <Folder Include="src\ASF\sam\services\flash_efc\" />
     <Folder Include="src\ASF\sam\utils\" />
     <Folder Include="src\ASF\sam\utils\cmsis\" />
     <Folder Include="src\ASF\sam\utils\cmsis\samg\" />
@@ -708,6 +719,12 @@
     <Compile Include="src\ASF\common\services\freertos\sam\freertos_usart_serial.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\ASF\sam\services\flash_efc\flash_efc.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <None Include="src\ASF\sam\services\flash_efc\flash_efc.h">
+      <SubType>compile</SubType>
+    </None>
     <Compile Include="src\services\CLI-commands.c">
       <SubType>compile</SubType>
     </Compile>

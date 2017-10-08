@@ -40,7 +40,7 @@ static portBASE_TYPE get_version_cmd   (char *pcWriteBuffer, size_t xWriteBuffer
 static portBASE_TYPE mem_cmd           (char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
 static portBASE_TYPE ps_cmd            (char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
 static portBASE_TYPE task_stats_cmd    (char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
-static portBASE_TYPE get_nmea_list_cmd (char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
+static portBASE_TYPE get_portmask_cmd  (char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LOCAL VARIABLES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -49,7 +49,7 @@ CLI_DEF_T get_version_cmd_def   = {"get_version",   "get_version\r\n",          
 CLI_DEF_T mem_cmd_def           = {"mem",           "mem\r\n",                         mem_cmd,           0};
 CLI_DEF_T ps_cmd_def            = {"ps",            "ps\r\n",                          ps_cmd,            0};
 CLI_DEF_T task_stats_cmd_def    = {"task-stats",    "task-stats\r\n",                  task_stats_cmd,    0};
-CLI_DEF_T get_nmea_list_cmd_def = {"get_nmea_list", "get_nmea_list port\r\n",          get_nmea_list_cmd, 1};
+CLI_DEF_T get_portmask_cmd_def  = {"get_portmask",  "get_portmask port\r\n",           get_portmask_cmd, 1};
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ FUNCTIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -61,7 +61,7 @@ void vRegisterCLICommands(void) {
 	FreeRTOS_CLIRegisterCommand(&mem_cmd_def);
 	FreeRTOS_CLIRegisterCommand(&ps_cmd_def);
 	FreeRTOS_CLIRegisterCommand(&task_stats_cmd_def);
-	FreeRTOS_CLIRegisterCommand(&get_nmea_list_cmd_def);
+	FreeRTOS_CLIRegisterCommand(&get_portmask_cmd_def);
 }
 
 
@@ -130,30 +130,39 @@ static portBASE_TYPE task_stats_cmd(char *pcWriteBuffer, size_t xWriteBufferLen,
 /*******************************************************************************
  * "Get NMEA sentence list" command
  */
-static portBASE_TYPE get_nmea_list_cmd(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString) {
+static portBASE_TYPE get_portmask_cmd(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString) {
 	const char *parameter_string;	
 	portBASE_TYPE parameter_string_length;
-	static const nmea_str_node_t* nmea_str_node = NULL;
+	static nmea_str_node_t* nmea_str_node = NULL;
+//	static int cnt = 0;
 	int port;
 
 	configASSERT(pcWriteBuffer);
 	
-	/* Obtain the parameter string. */
-	parameter_string = FreeRTOS_CLIGetParameter(pcCommandString, 1, &parameter_string_length);
-	
-	/* Check parameter */
-	if (parameter_string != NULL && (parameter_string[0] >= '0'  && parameter_string[0] <= '4')) {
-		port = parameter_string[0] - '0';
-	} else {
-		sprintf(pcWriteBuffer, "Unknown port (ports 0->4)\n\r");
-		return pdFALSE;
-	}
-	
 	if (nmea_str_node == NULL) {
+		/* Obtain the parameter string. */
+		parameter_string = FreeRTOS_CLIGetParameter(pcCommandString, 1, &parameter_string_length);
+	
+		/* Check parameter */
+		if (parameter_string != NULL && (parameter_string[0] >= '0'  && parameter_string[0] <= '4')) {
+			port = parameter_string[0] - '0';
+		} else {
+			sprintf(pcWriteBuffer, "Unknown port (ports 0->4)\n\r");
+			return pdFALSE;
+		}
 		nmea_str_node = nmea_tree_get_list(nmea_search_tree[port]);
+		nmea_tree_get_string(nmea_search_tree[port]);
+		
+//		printf("get_portmask_cmd first run\n\r");
+//		printf("nmea_str_node = %p\n\r", nmea_str_node);
 		sprintf(pcWriteBuffer, "\n\rNMEA Port %d:\n\r", port);
-		return pdTRUE;
+//		cnt = 0;
+		return pdPASS;
 	}
+
+//	printf("nmea_str_node = %p\n\r", nmea_str_node);
+//	printf("get_portmask_cmd #%d run\n\r", cnt);
+//	cnt = cnt + 1;
 
 	sprintf(pcWriteBuffer, "%s 0x%.2X\n\r", nmea_str_node->str, nmea_str_node->port_mask);
 
@@ -161,8 +170,10 @@ static portBASE_TYPE get_nmea_list_cmd(char *pcWriteBuffer, size_t xWriteBufferL
 	nmea_str_node = nmea_str_node->next;
 	
 	if (nmea_str_node == NULL) {
+//		printf("Last\n\r");
 		return pdFALSE;
 	} else {
-		return pdTRUE;
+//		printf("More\n\r");
+		return pdPASS;
 	}
 }

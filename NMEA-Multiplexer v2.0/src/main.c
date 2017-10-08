@@ -153,9 +153,9 @@ int main (void)
 	
 	for (i = 0; i < 5; i++) {
 		nmea_search_tree[i] = nmea_tree_init();
-		nmea_tree_add(nmea_search_tree[i], "$GPGSV,", 0x03);
-		nmea_tree_add(nmea_search_tree[i], "$GPGLL,", 0x06);
-		nmea_tree_add(nmea_search_tree[i], "$NISSE,", 0x0F);
+		nmea_tree_add(nmea_search_tree[i], "$GPGSV", 0x03);
+		nmea_tree_add(nmea_search_tree[i], "$GPGLL", 0x06);
+		nmea_tree_add(nmea_search_tree[i], "$NISSE", 0x0F);
 	}
 
 	nmea_str_node_t* nmea_str_node;
@@ -163,6 +163,35 @@ int main (void)
 	while (nmea_str_node != NULL) {
 		printf("nmea_str_node %p %s 0x%.2X\n\r", nmea_str_node, nmea_str_node->str, nmea_str_node->port_mask);
 		nmea_str_node = nmea_str_node->next;
+	}
+
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// Play with Flash
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	
+	uint32_t* flash_ptr;
+	
+	flash_ptr = 0x480000 - 4096;
+	for (i = 0; i < 4; i++) {
+		printf("Flash %.8p = 0x%.8X\n\r", flash_ptr, *flash_ptr);
+		flash_ptr++;
+	}
+	
+	flash_init(FLASH_ACCESS_MODE_128, 5);  // 5 Wait-states
+	
+	uint32_t data[8];
+	data[0] = 0xDEADBEEF;
+	data[1] = 0xCAFEBABE;
+	data[2] = 0xB00BBABE;
+	data[3] = 0x12345678;
+	
+	flash_ptr = 0x480000 - 4096;
+	printf("flash_write %d\n\r", flash_write(flash_ptr, data, 4*4, 0));
+	
+	flash_ptr = 0x480000 - 4096;
+	for (i = 0; i < 4; i++) {
+		printf("Flash %.8p = 0x%.8X\n\r", flash_ptr, *flash_ptr);
+		flash_ptr++;
 	}
 
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -46,7 +46,8 @@ SEARCH_DIR(.)
 /* Memory Spaces Definitions */
 MEMORY
 {
-  rom (rx)  : ORIGIN = 0x00400000, LENGTH = 0x00080000
+/* We reserve the last 4 kByte for 'EEPROM' typ of data */
+  rom (rx)  : ORIGIN = 0x00400000, LENGTH = 0x00080000 - 4096
   ram (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00028000
 }
 

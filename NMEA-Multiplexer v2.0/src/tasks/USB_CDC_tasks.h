@@ -16,11 +16,11 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ DEFINES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 /* Task priorities */
-#define CDC_CLI_TASK_PRIORITY				(tskIDLE_PRIORITY + 1)
+#define CDC_CLI_TASK_PRIORITY		(tskIDLE_PRIORITY + 1)
 #define CDC_NMEA_TASK_PRIORITY		(tskIDLE_PRIORITY + 1)
 
 /* Task stack sizes */
-#define CDC_CLI_TASK_STACK_SIZE				(configMINIMAL_STACK_SIZE * 4)
+#define CDC_CLI_TASK_STACK_SIZE		(configMINIMAL_STACK_SIZE * 10)
 #define CDC_NMEA_TASK_STACK_SIZE	(configMINIMAL_STACK_SIZE * 4)
 
 extern bool usb_power;

@@ -22,6 +22,13 @@ typedef struct _nmea_node_t {
 
 
 /************************************************************************************
+ * nmea_tree_get_string
+ * Get a linked list of all NMEA sentences and Port Masks from the NMEA search tree
+ ************************************************************************************/
+char* nmea_tree_get_string(nmea_node_t* nmea_node);
+
+
+/************************************************************************************
  * nmea_str_node struct
  * NMEA sentence list node
  ************************************************************************************/
