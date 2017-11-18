@@ -19,9 +19,9 @@
  ************************************************************************************/
 nmea_node_t* nmea_node_create(char character, uint8_t port_mask) {
   nmea_node_t* nmea_node;
-  
+
   nmea_node = (nmea_node_t*)pvPortMalloc(sizeof(nmea_node_t));
-  
+
   nmea_node->right     = NULL;
   nmea_node->down      = NULL;
   nmea_node->character = character;
@@ -64,7 +64,7 @@ void nmea_del_list(nmea_str_node_t** nmea_str_node_ref) {
 
   curr_node = *nmea_str_node_ref;
 //  printf("curr_node 0x%.8X\n", curr_node);
-  
+
   while (curr_node != NULL) {
     next_node = curr_node->next;
     vPortFree(curr_node->str);      // De-allocate string memory
@@ -76,118 +76,47 @@ void nmea_del_list(nmea_str_node_t** nmea_str_node_ref) {
   *nmea_str_node_ref = (nmea_str_node_t*)NULL;
 }
 
+void nmea_tree_get_string_rec(nmea_node_t* nmea_node, char* nmea_str, char* nmea_type_str);
 
 /************************************************************************************
  * nmea_tree_get_string
- * Get a linked list of all NMEA sentences and Port Masks from the NMEA search tree
+ * Get a string of all NMEA sentences and Port Masks from the NMEA search tree
  ************************************************************************************/
-char* nmea_tree_get_string(nmea_node_t* nmea_node) {
-	int string_len = 0;
-	nmea_str_node_t* nmea_str_node;
-	nmea_str_node_t* nmea_str_node_bak;
-	char* str;
-	char* str_bak;
-	
-	printf("nmea_tree_get_string: calculating space needed\n\r");
+int nmea_tree_get_string(nmea_node_t* nmea_node, char* nmea_str) {
+  char nmea_type_str[10];
 
-	nmea_str_node_bak = nmea_tree_get_list(nmea_node);
-	nmea_str_node = nmea_str_node_bak;
-	
-	while(nmea_str_node != NULL) {
-		printf("nmea_tree_get_string: str %s (%d)\n\r", nmea_str_node->str, strlen(nmea_str_node->str));
-		string_len += strlen(nmea_str_node->str) + 1 + 1 + 1;	// NMEA string + null + port mask + null
-		nmea_str_node = nmea_str_node->next;
-	}
-	
-	printf("nmea_tree_get_string: total string length %d\n\r", string_len);
-	str_bak = (char*)pvPortMalloc(string_len + 1);
-	str = str_bak;
-	
-	str[0] = 0x00;
-	
-	nmea_str_node = nmea_str_node_bak;
-	
-	while(nmea_str_node != NULL) {
-		strcat(str, nmea_str_node->str);
-		strcat(str, ";");
-		nmea_str_node = nmea_str_node->next;
-	}
-	
-	printf("nmea_tree_get_string: string %s\n\r", str);
-	
+  nmea_type_str[0] = 0x00;  // Make empty string
+	nmea_str[0] = 0x00;				// Make empty string
+
+  nmea_tree_get_string_rec(nmea_node, nmea_str, nmea_type_str);
+  return 1;
 }
 
 
-nmea_str_node_t* nmea_tree_get_list_rec(nmea_node_t* nmea_node, nmea_str_node_t* last_nmea_str_node, char* nmea_str);
 
-/************************************************************************************
- * nmea_tree_get_list
- * Get a linked list of all NMEA sentences and Port Masks from the NMEA search tree
- ************************************************************************************/
-nmea_str_node_t* nmea_tree_get_list(nmea_node_t* nmea_node) {
-  char temp_str[10];
-  nmea_str_node_t* next_nmea_str_node;
-  nmea_str_node_t* first_nmea_str_node;
-  
-  temp_str[0] = 0x00;  // Empty string
+/* Recursive help function for nmea_tree_get_string */
+void nmea_tree_get_string_rec(nmea_node_t* nmea_node, char* nmea_str, char* nmea_type_str) {
+	int nmea_type_str_len;
 
-  // Allocate first 'dummy' node
-  first_nmea_str_node = (nmea_str_node_t*)pvPortMalloc(sizeof(nmea_str_node_t));
+	// Get current length of NMEA type string (so far)
+	nmea_type_str_len = strlen(nmea_type_str);
 
-  //  printf("first_nmea_str_node ptr %p\n", first_nmea_str_node);
-  nmea_tree_get_list_rec(nmea_node, first_nmea_str_node, temp_str);
-  next_nmea_str_node = first_nmea_str_node->next;
+	while (nmea_node != NULL) {
+		// Check if last character in NMEA type string is found
+		if (nmea_node->right == NULL) {
+			// Append NMEA type string
+			sprintf(nmea_type_str + nmea_type_str_len, "%c=%.2X", nmea_node->character, nmea_node->port_mask);
+			strcat(nmea_str, nmea_type_str);
+			printf("after append: %s\n\r", nmea_str);
+		} else {
+			// Add character to the temporary NMEA type string
+			sprintf(nmea_type_str + nmea_type_str_len, "%c", nmea_node->character);
+			nmea_tree_get_string_rec(nmea_node->right, nmea_str, nmea_type_str);
+		}
 
-  // Delete first 'dummy' node
-  vPortFree(first_nmea_str_node);
-  
-//  printf("next_nmea_str_node ptr %p\n\r", next_nmea_str_node);
-  return next_nmea_str_node;
-}
-
-
-/* Recursive help function for nmea_tree_get_list */
-nmea_str_node_t* nmea_tree_get_list_rec(nmea_node_t* nmea_node, nmea_str_node_t* last_nmea_str_node, char* nmea_str) {
-  nmea_str_node_t* new_nmea_str_node;
-  int nmea_str_len;
-
-  // Get current length of NMEA sentence (so far)
-  nmea_str_len = strlen(nmea_str);
-
-  while (nmea_node != NULL) {
-    // Add character to string
-    nmea_str[nmea_str_len + 0] = nmea_node->character;
-    nmea_str[nmea_str_len + 1] = 0x00;
-    //    printf("While: nmea_str %s, char %c, len %d\n", nmea_str, nmea_node->character, nmea_str_len);
-    
-    if (nmea_node->right != NULL) {
-      // Continue with next character
-      last_nmea_str_node = nmea_tree_get_list_rec(nmea_node->right, last_nmea_str_node, nmea_str);
-    } else {
-      // Append latest NMEA sentence
-      new_nmea_str_node = (nmea_str_node_t*)pvPortMalloc(sizeof(nmea_str_node_t));
-      new_nmea_str_node->str = (char*)pvPortMalloc(strlen(nmea_str) + 1);
-      new_nmea_str_node->port_mask = nmea_node->port_mask;
-      new_nmea_str_node->next = NULL;
-	  
-      strcpy(new_nmea_str_node->str, nmea_str);
-      //      printf("Allocate new_all_nmea_str %d + %d + 2 = %d, %p\n", strlen(all_nmea_sentences), strlen(nmea_str), strlen(all_nmea_sentences) + strlen(nmea_str) + 2, new_all_nmea_str);
-      //      printf("  nmea_str %s\n", nmea_str);
-      //      printf("  new_all_nmea_str %s\n", new_all_nmea_str);
-
-      last_nmea_str_node->next = new_nmea_str_node;
-
-      last_nmea_str_node = new_nmea_str_node;
-      
-      //      strcat(all_nmea_sentences, nmea_str);
-      //      all_nmea_sentences[strlen(all_nmea_sentences) + 1] = 0x00;
-      //      all_nmea_sentences[strlen(all_nmea_sentences) + 0] = '\n';
-    }
-    nmea_node = nmea_node->down;
-  }
-
-//	printf("nmea_tree_get_list last_nmea_str_node = %p\n\r", last_nmea_str_node);
-  return last_nmea_str_node;
+		// Next NMEA type string
+		nmea_node = nmea_node->down;
+	}
 }
 
 
@@ -207,7 +136,7 @@ nmea_node_t* nmea_tree_init() {
  ************************************************************************************/
 int nmea_tree_add(nmea_node_t* curr_node, char* nmea_string, uint8_t port_mask) {
 	nmea_node_t* new_node;
-	
+
 //	printf("Insert NMEA %s 0x%.2X %p\n\r", nmea_string, port_mask, curr_node);
 
 	// Loop through all characters
@@ -229,7 +158,7 @@ int nmea_tree_add(nmea_node_t* curr_node, char* nmea_string, uint8_t port_mask) 
 					curr_node->right = new_node;
 					curr_node = new_node;
 					nmea_string++;
-					break;					
+					break;
 				} else {
 //					printf("go right\n\r");
 					curr_node = curr_node->right;
@@ -261,7 +190,7 @@ int nmea_tree_add(nmea_node_t* curr_node, char* nmea_string, uint8_t port_mask) 
 		curr_node = new_node;
 		nmea_string++;
 	}
-	
+
 	curr_node->port_mask = port_mask;
 	return 1;
 }

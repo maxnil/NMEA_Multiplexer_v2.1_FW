@@ -25,7 +25,7 @@ typedef struct _nmea_node_t {
  * nmea_tree_get_string
  * Get a linked list of all NMEA sentences and Port Masks from the NMEA search tree
  ************************************************************************************/
-char* nmea_tree_get_string(nmea_node_t* nmea_node);
+int nmea_tree_get_string(nmea_node_t* nmea_node, char* nmea_str);
 
 
 /************************************************************************************
@@ -58,13 +58,6 @@ uint8_t nmea_get_port_mask(nmea_node_t* nmea_node, char* nmea_sentence);
  * Delete (free memory) the linked list of all NMEA sentences and Port Masks
  ************************************************************************************/
 void nmea_del_list(nmea_str_node_t** nmea_str_node_ref);
-
-
-/************************************************************************************
- * nmea_tree_get_list
- * Get a linked list of all NMEA sentences and Port Masks from the NMEA search tree
- ************************************************************************************/
-nmea_str_node_t* nmea_tree_get_list(nmea_node_t* nmea_node);
 
 
 /************************************************************************************

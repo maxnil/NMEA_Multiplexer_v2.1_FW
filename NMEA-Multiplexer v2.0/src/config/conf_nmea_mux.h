@@ -11,6 +11,9 @@
 
 #define SW_VERSION "v0.1.2"
 
+#define DISK_SIZE 8192
+#define DISK_ADDR (0x480000 - DISK_SIZE)
+
 #define DEBUG_L1
 
 /* Initial LED test delay (in ms, set to 0 to disable) */
