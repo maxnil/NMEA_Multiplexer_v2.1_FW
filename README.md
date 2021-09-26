@@ -1,7 +1,7 @@
-# NMEA_Multiplexer_v2.0_FW
-NMEA Multiplexer version 2.0
+# NMEA_Multiplexer_v2_FW
+NMEA Multiplexer version 2
 
-This repository contains the firmware for the NMEA Multiplexer v2.0
+This repository contains the firmware for the NMEA Multiplexer v2
 
 Features:
 5x NMEA ports (4800 baud, RS232)
