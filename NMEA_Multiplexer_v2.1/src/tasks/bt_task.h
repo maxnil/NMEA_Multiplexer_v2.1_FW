@@ -19,7 +19,6 @@
 #define BT_TASK_PRIORITY		(tskIDLE_PRIORITY + 1)
 
 /* Task stack sizes */
-//#define NMEA_PORT_TASK_STACK_SIZE	(configMINIMAL_STACK_SIZE * 3)
 #define BT_TASK_STACK_SIZE	(1024)
 
 #define BT_RX_BUFFER_SIZE	100

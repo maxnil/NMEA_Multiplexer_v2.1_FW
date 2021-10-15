@@ -12,7 +12,7 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INCLUDES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #include "task.h"
-#include "compiler.h"
+//#include "compiler.h"
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ DEFINES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -21,24 +21,10 @@
 #define CDC_NMEA_TASK_PRIORITY		(tskIDLE_PRIORITY + 1)
 
 /* Task stack sizes */
-#define CDC_CLI_TASK_STACK_SIZE		(configMINIMAL_STACK_SIZE * 10)
-#define CDC_NMEA_TASK_STACK_SIZE	(configMINIMAL_STACK_SIZE * 4)
-
-extern bool usb_power;
-extern bool usb_connected;
+#define CDC_CLI_TASK_STACK_SIZE		(4096)
+#define CDC_NMEA_TASK_STACK_SIZE	(2048)
 
 /* USB CDC Task creator */
 void create_usb_cdc_tasks(void);
-
-void cdc_cli_output(const uint8_t const *message_string);
-
-//void usb_vbus_event_callback(bool b_vbus_high);
-//void usb_cdc_suspend_callback();
-//void usb_cdc_resume_callback();
-//bool usb_cdc_set_dtr_callback(uint8_t port, bool set);
-//bool usb_cdc_set_rts_callback(uint8_t port, bool set);
-//bool usb_cdc_rx_notify_callback(uint8_t port);
-//bool usb_cdc_enable_callback(uint8_t port);
-//bool usb_cdc_disable_callback(uint8_t port);
 
 #endif /* USB_CDC_CLI_TASK_H_ */

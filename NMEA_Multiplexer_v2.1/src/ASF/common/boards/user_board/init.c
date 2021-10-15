@@ -31,8 +31,8 @@ void board_init(void)
 	delay_init(BOARD_MCK);
 
 	/** Configure LED pins */
-	ioport_set_pin_dir(LED_BT_RX_PIN,	 	  IOPORT_DIR_OUTPUT);
-	ioport_set_pin_dir(LED_BT_TX_PIN,		  IOPORT_DIR_OUTPUT);
+	ioport_set_pin_dir(LED_BT_RX_PIN,	 	IOPORT_DIR_OUTPUT);
+	ioport_set_pin_dir(LED_BT_TX_PIN,		IOPORT_DIR_OUTPUT);
 	ioport_set_pin_dir(LED_PORT_1_ERR_PIN,	IOPORT_DIR_OUTPUT);
 	ioport_set_pin_dir(LED_PORT_1_RX_PIN,	IOPORT_DIR_OUTPUT);
 	ioport_set_pin_dir(LED_PORT_1_TX_PIN,	IOPORT_DIR_OUTPUT);

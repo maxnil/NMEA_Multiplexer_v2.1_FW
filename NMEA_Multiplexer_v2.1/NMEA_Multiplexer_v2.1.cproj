@@ -33,11 +33,12 @@
         <options>
           <option id="common.boards" value="Add" config="" content-id="Atmel.ASF" />
           <option id="common.services.delay" value="Add" config="" content-id="Atmel.ASF" />
-          <option id="sam.services.flash" value="Add" config="" content-id="Atmel.ASF" />
           <option id="common.services.layer.freertos.usart" value="Add" config="" content-id="Atmel.ASF" />
           <option id="common.services.ioport" value="Add" config="" content-id="Atmel.ASF" />
-          <option id="common.utils.stdio.stdio_serial" value="Add" config="" content-id="Atmel.ASF" />
           <option id="common.services.usb.class.device" value="Add" config="cdc" content-id="Atmel.ASF" />
+          <option id="common.utils.stdio.stdio_serial" value="Add" config="" content-id="Atmel.ASF" />
+          <option id="sam.services.flash" value="Add" config="" content-id="Atmel.ASF" />
+          <option id="sam.drivers.rstc" value="Add" config="" content-id="Atmel.ASF" />
           <option id="sam.utils.linker_scripts" value="Add" config="" content-id="Atmel.ASF" />
         </options>
         <configurations>
@@ -273,6 +274,9 @@
           <file path="src/ASF/thirdparty/freertos/freertos-7.3.0/source/include/FreeRTOS_CLI.h" framework="" version="3.49.1" source="thirdparty\freertos\freertos-7.3.0\source\include\FreeRTOS_CLI.h" changed="False" content-id="Atmel.ASF" />
           <file path="src/ASF/thirdparty/freertos/freertos-7.3.0/source/include/croutine.h" framework="" version="3.49.1" source="thirdparty\freertos\freertos-7.3.0\source\include\croutine.h" changed="False" content-id="Atmel.ASF" />
           <file path="src/Config/FreeRTOSConfig.h" framework="" version="3.49.1" source="thirdparty\freertos\freertos-7.3.0\module_config\FreeRTOSConfig.h" changed="False" content-id="Atmel.ASF" />
+          <file path="src/ASF/sam/drivers/rstc/rstc.c" framework="" version="3.49.1" source="sam\drivers\rstc\rstc.c" changed="False" content-id="Atmel.ASF" />
+          <file path="src/ASF/sam/drivers/rstc/rstc.h" framework="" version="3.49.1" source="sam\drivers\rstc\rstc.h" changed="False" content-id="Atmel.ASF" />
+          <file path="src/ASF/sam/drivers/rstc/example1/rstc_example1.h" framework="" version="3.49.1" source="sam\drivers\rstc\example1\rstc_example1.h" changed="False" content-id="Atmel.ASF" />
         </files>
         <documentation help="https://asf.microchip.com/docs/3.49.1/common.applications.user_application.user_board.samg55j19/html/index.html" />
         <offline-documentation help="" />
@@ -356,8 +360,11 @@
       <Value>../src/ASF/common/utils/stdio/stdio_serial</Value>
       <Value>../src/ASF/sam/drivers/udp</Value>
       <Value>../src/ASF/sam/drivers/usart</Value>
-      <Value>../src/ASF/thirdparty/freertos/freertos-7.3.0/source/include</Value>
-      <Value>../src/ASF/thirdparty/freertos/freertos-7.3.0/source/portable/gcc/sam_cm4f</Value>
+      <Value>../src/ASF/sam/drivers/rstc/example1</Value>
+      <Value>../src/ASF/sam/drivers/rstc</Value>
+      <Value>../src/ASF/thirdparty/freertos/freertos-10.4.4/source/portable/gcc/sam_cm4f</Value>
+      <Value>../src/ASF/thirdparty/freertos/freertos-10.4.4/source/include</Value>
+      <Value>../src/ASF/thirdparty/freertos/FreeRTOS-Plus-CLI</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
   <armgcc.compiler.optimization.level>Optimize for size (-Os)</armgcc.compiler.optimization.level>
@@ -418,6 +425,8 @@
       <Value>../src/ASF/sam/drivers/usart</Value>
       <Value>../src/ASF/thirdparty/freertos/freertos-7.3.0/source/include</Value>
       <Value>../src/ASF/thirdparty/freertos/freertos-7.3.0/source/portable/gcc/sam_cm4f</Value>
+      <Value>../src/ASF/sam/drivers/rstc/example1</Value>
+      <Value>../src/ASF/sam/drivers/rstc</Value>
     </ListValues>
   </armgcc.assembler.general.IncludePaths>
   <armgcc.preprocessingassembler.general.AssemblerFlags>-DARM_MATH_CM4=true -DBOARD=USER_BOARD -Dprintf=iprintf -Dscanf=iscanf -DUDD_ENABLE -D__FREERTOS__</armgcc.preprocessingassembler.general.AssemblerFlags>
@@ -460,6 +469,8 @@
       <Value>../src/ASF/sam/drivers/usart</Value>
       <Value>../src/ASF/thirdparty/freertos/freertos-7.3.0/source/include</Value>
       <Value>../src/ASF/thirdparty/freertos/freertos-7.3.0/source/portable/gcc/sam_cm4f</Value>
+      <Value>../src/ASF/sam/drivers/rstc/example1</Value>
+      <Value>../src/ASF/sam/drivers/rstc</Value>
     </ListValues>
   </armgcc.preprocessingassembler.general.IncludePaths>
 </ArmGcc>
@@ -521,12 +532,13 @@
       <Value>../src/ASF/common/utils/stdio/stdio_serial</Value>
       <Value>../src/ASF/sam/drivers/udp</Value>
       <Value>../src/ASF/sam/drivers/usart</Value>
+      <Value>../src/ASF/sam/drivers/rstc/example1</Value>
+      <Value>../src/ASF/sam/drivers/rstc</Value>
       <Value>../src/ASF/thirdparty/freertos/freertos-10.4.4/source/include</Value>
       <Value>../src/ASF/thirdparty/freertos/freertos-10.4.4/source/portable/gcc/sam_cm4f</Value>
       <Value>../src/ASF/thirdparty/freertos/FreeRTOS-Plus-CLI</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
-  <armgcc.compiler.optimization.level>Optimize (-O1)</armgcc.compiler.optimization.level>
   <armgcc.compiler.optimization.OtherFlags>-fdata-sections</armgcc.compiler.optimization.OtherFlags>
   <armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</armgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
   <armgcc.compiler.optimization.DebugLevel>Maximum (-g3)</armgcc.compiler.optimization.DebugLevel>
@@ -585,6 +597,8 @@
       <Value>../src/ASF/sam/drivers/usart</Value>
       <Value>../src/ASF/thirdparty/freertos/freertos-7.3.0/source/include</Value>
       <Value>../src/ASF/thirdparty/freertos/freertos-7.3.0/source/portable/gcc/sam_cm4f</Value>
+      <Value>../src/ASF/sam/drivers/rstc/example1</Value>
+      <Value>../src/ASF/sam/drivers/rstc</Value>
     </ListValues>
   </armgcc.assembler.general.IncludePaths>
   <armgcc.assembler.debugging.DebugLevel>Default (-g)</armgcc.assembler.debugging.DebugLevel>
@@ -628,6 +642,8 @@
       <Value>../src/ASF/sam/drivers/usart</Value>
       <Value>../src/ASF/thirdparty/freertos/freertos-7.3.0/source/include</Value>
       <Value>../src/ASF/thirdparty/freertos/freertos-7.3.0/source/portable/gcc/sam_cm4f</Value>
+      <Value>../src/ASF/sam/drivers/rstc/example1</Value>
+      <Value>../src/ASF/sam/drivers/rstc</Value>
     </ListValues>
   </armgcc.preprocessingassembler.general.IncludePaths>
   <armgcc.preprocessingassembler.debugging.DebugLevel>Default (-Wa,-g)</armgcc.preprocessingassembler.debugging.DebugLevel>
@@ -671,6 +687,8 @@
     <Folder Include="src\ASF\sam\drivers\pdc\pdc_uart_example\" />
     <Folder Include="src\ASF\sam\drivers\pio\" />
     <Folder Include="src\ASF\sam\drivers\pmc\" />
+    <Folder Include="src\ASF\sam\drivers\rstc\" />
+    <Folder Include="src\ASF\sam\drivers\rstc\example1\" />
     <Folder Include="src\ASF\sam\drivers\supc\" />
     <Folder Include="src\ASF\sam\drivers\udp\" />
     <Folder Include="src\ASF\sam\drivers\usart\" />
@@ -722,6 +740,18 @@
     <Compile Include="src\application_hooks.h">
       <SubType>compile</SubType>
     </Compile>
+    <None Include="src\ASF\sam\drivers\rstc\example1\rstc_example1.h">
+      <SubType>compile</SubType>
+    </None>
+    <Compile Include="src\ASF\sam\drivers\rstc\rstc.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <None Include="src\ASF\sam\drivers\rstc\rstc.h">
+      <SubType>compile</SubType>
+    </None>
+    <Compile Include="src\RunTineStatsTimer.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\services\CLI-commands.c">
       <SubType>compile</SubType>
     </Compile>
@@ -740,10 +770,31 @@
     <Compile Include="src\services\nmea_func.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\services\storage.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\services\storage.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\services\usart_setting.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\services\usart_setting.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\services\usb.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\services\usb.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\tasks\bt_task.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\tasks\bt_task.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\tasks\misc_task.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\tasks\led_timer_task.c">
@@ -752,16 +803,13 @@
     <Compile Include="src\tasks\led_timer_task.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\tasks\misc_task.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\tasks\nmea_port_tasks.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\tasks\nmea_port_tasks.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="src\tasks\task_queues.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="src\tasks\task_queues.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\tasks\USB_CDC_tasks.c">

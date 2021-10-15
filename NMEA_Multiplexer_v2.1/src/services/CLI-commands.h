@@ -9,7 +9,11 @@
 #ifndef CLI_COMMANDS_H_
 #define CLI_COMMANDS_H_
 
+//#include "services/nmea_func.h"
+
 #define RESPONSE_TIMEOUT_MS 1000
+
+extern bool disable_usb_nmea;
 
 void vRegisterCLICommands(void);
 

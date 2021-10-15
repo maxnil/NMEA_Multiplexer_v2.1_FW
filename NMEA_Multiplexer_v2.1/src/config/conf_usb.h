@@ -38,7 +38,7 @@
 #define _CONF_USB_H_
 
 #include "compiler.h"
-//#include "tasks/USB_CDC_tasks.h"
+#include "FreeRTOS.h"
 
 //#warning You must refill the following definitions with a correct values
 
@@ -47,6 +47,11 @@
  * @{
  */
 
+#define USB_VBUS_FLAGS (PIO_INPUT | PIO_DEBOUNCE | PIO_IT_EDGE)
+#define USB_VBUS_PIN_IRQn (PIOA_IRQn)
+#define USB_VBUS_PIO_ID (ID_PIOA)
+#define USB_VBUS_PIO_MASK (PIO_PA15)
+
 //! Device definition (mandatory)
 #define  USB_DEVICE_VENDOR_ID             USB_VID_ATMEL
 #define  USB_DEVICE_PRODUCT_ID            USB_PID_ATMEL_ASF_CDC
@@ -54,26 +59,11 @@
 #define  USB_DEVICE_MINOR_VERSION         0
 #define  USB_DEVICE_POWER                 100 // Consumption on Vbus line (mA)
 #define  USB_DEVICE_ATTR                  USB_CONFIG_ATTR_SELF_POWERED
-// (USB_CONFIG_ATTR_BUS_POWERED)
-// (USB_CONFIG_ATTR_REMOTE_WAKEUP|USB_CONFIG_ATTR_SELF_POWERED)
-// (USB_CONFIG_ATTR_REMOTE_WAKEUP|USB_CONFIG_ATTR_BUS_POWERED)
 
 //! USB Device string definitions (Optional)
 #define  USB_DEVICE_MANUFACTURE_NAME      "DML"
 #define  USB_DEVICE_PRODUCT_NAME          "NMEA Multiplexer"
 #define  USB_DEVICE_SERIAL_NAME           "0001"
-
-
-/**
- * Device speeds support
- * Low speed not supported by CDC
- * @{
- */
-//! To authorize the High speed
-#if (UC3A3||UC3A4)
-#define  USB_DEVICE_HS_SUPPORT
-#endif
-//@}
 
 
 /**
@@ -111,8 +101,8 @@ extern void usb_cdc_resume_callback(void);
  */
 
 //! Number of communication port used (1 to 3)
-//#define  UDI_CDC_PORT_NB 2
 #define  UDI_CDC_PORT_NB 1
+//#define  UDI_CDC_PORT_NB 1
 
 //! Interface callback definition
 extern bool usb_cdc_enable_callback(uint8_t port);
@@ -147,6 +137,8 @@ extern bool usb_cdc_set_rts_callback(uint8_t port, bool set);
 //! Define it when the transfer CDC Device to Host is a low rate (<512000 bauds)
 //! to reduce CDC buffers size
 #define  UDI_CDC_LOW_RATE
+
+#define  UDD_USB_INT_LEVEL configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY
 
 //! Default configuration of communication port
 #define  UDI_CDC_DEFAULT_RATE             115200

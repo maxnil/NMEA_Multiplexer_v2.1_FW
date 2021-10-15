@@ -81,7 +81,7 @@
 // From module: FreeRTOS mini Real-Time Kernel
 #include <FreeRTOS.h>
 #include <FreeRTOS_CLI.h>
-#include <stack_macros.h>
+//#include <StackMacros.h>
 #include <croutine.h>
 #include <list.h>
 #include <mpu_wrappers.h>
@@ -116,6 +116,9 @@
 
 // From module: Part identification macros
 #include <parts.h>
+
+// From module: RSTC - Reset Controller
+#include <rstc.h>
 
 // From module: SAM FPU driver
 #include <fpu.h>

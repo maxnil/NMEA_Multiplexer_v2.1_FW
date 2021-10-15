@@ -12,5 +12,7 @@
 #define CONF_BOARD_H
 
 #define BOARD USER_BOARD
+#define CONF_BOARD_USB_PORT
+#define CONF_BOARD_USB_VBUS_DETECT
 
 #endif // CONF_BOARD_H

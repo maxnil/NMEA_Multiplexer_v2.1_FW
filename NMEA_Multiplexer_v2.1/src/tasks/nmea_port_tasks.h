@@ -11,9 +11,22 @@
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INCLUDES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#include "task.h"
-#include "services/nmea_func.h"
+#include "FreeRTOS.h"
+#include "queue.h"
+#include "config/conf_nmea_mux.h"
+//#include "services/nmea_func.h"
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ DEFINES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#define NMEA_PORT_TASK_NR_NMEA_PORTS (CONF_NMEA_MUX_NR_NMEA_UART_PORTS + CONF_NMEA_MUX_NR_NMEA_USB_PORTS  + CONF_NMEA_MUX_NR_NMEA_BT_PORTS)
+
+#define NMEA_PORT_TASK_UART_PORT_1 0
+#define NMEA_PORT_TASK_UART_PORT_2 1
+#define NMEA_PORT_TASK_UART_PORT_3 2
+#define NMEA_PORT_TASK_UART_PORT_4 3
+#define NMEA_PORT_TASK_UART_PORT_5 4
+#define NMEA_PORT_TASK_BT_PORT 5
+#define NMEA_PORT_TASK_USB_PORT 6
 
 /* Task priorities */
 #define NMEA_PORT_TASK_PRIORITY		(tskIDLE_PRIORITY + 1)
@@ -24,9 +37,9 @@
 
 #define NMEA_PORT_RX_BUFFER_SIZE	100
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ FUNCTIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+extern QueueHandle_t nmea_tx_queues[NMEA_PORT_TASK_NR_NMEA_PORTS];    // NMEA Tx Data queues
 
-extern nmea_node_t* nmea_search_tree[5];
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ FUNCTIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 /* NMEA Task creator */
 void create_nmea_port_tasks(void);

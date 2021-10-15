@@ -5,7 +5,6 @@
  *  Author: Max
  */
 
-
 #ifndef APPLICATION_HOOKS_H_
 #define APPLICATION_HOOKS_H_
 
@@ -20,7 +19,6 @@ void vApplicationIdleHook(void);
 void vApplicationStackOverflowHook(TaskHandle_t pxTask, char *pcTaskName);
 
 void vApplicationTickHook(void);
-
 void vAssertCalled(uint32_t ulLine, const char *pcFile);
 
 #endif /* APPLICATION_HOOKS_H_ */

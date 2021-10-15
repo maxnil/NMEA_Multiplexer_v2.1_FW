@@ -5,12 +5,10 @@
  *  Author: Max
  */
 
-#include <asf.h>
-
 /* FreeRTOS */
+//#include <asf.h>
 #include "FreeRTOS.h"
 #include "task.h"
-
 #include "application_hooks.h"
 
 void vApplicationMallocFailedHook(void) {
@@ -24,11 +22,12 @@ void vApplicationMallocFailedHook(void) {
 	FreeRTOSConfig.h, and the xPortGetFreeHeapSize() API function can be used
 	to query the size of free heap space that remains (although it does not
 	provide information on how the remaining heap might be fragmented). */
-	taskDISABLE_INTERRUPTS();
-	printf("###ERROR: vApplicationMallocFailedHook() failed\n");
+	//taskDISABLE_INTERRUPTS();
+	printf("###ERROR: vApplicationMallocFailedHook() failed (out of heap memmory)\r\n");
 	for (;;) {
 	}
 }
+
 
 
 void vApplicationIdleHook(void) {

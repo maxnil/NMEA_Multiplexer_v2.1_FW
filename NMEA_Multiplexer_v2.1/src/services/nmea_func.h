@@ -9,6 +9,11 @@
 #ifndef NMEA_FUNC_H_
 #define NMEA_FUNC_H_
 
+#include <FreeRTOS.h>
+#include "queue.h"
+#include "config/conf_nmea_mux.h"
+
+
 /************************************************************************************
  * nmea_node struct
  * NMEA sentence search tree node
@@ -20,6 +25,8 @@ typedef struct _nmea_node_t {
   uint8_t port_mask;
 } nmea_node_t;
 
+// Global NMEA sentence search trees, one for each of the 7 NMEA Rx tasks
+extern nmea_node_t* nmea_search_trees[CONF_NMEA_MUX_NR_NMEA_UART_PORTS + CONF_NMEA_MUX_NR_NMEA_USB_PORTS  + CONF_NMEA_MUX_NR_NMEA_BT_PORTS];
 
 /************************************************************************************
  * nmea_tree_get_string
@@ -64,7 +71,7 @@ void nmea_del_list(nmea_str_node_t** nmea_str_node_ref);
  * nmea_tree_init
  * Initialize NMEA Search Tree
  ************************************************************************************/
-nmea_node_t* nmea_tree_init(char* nmea_tree_string);
+nmea_node_t* nmea_tree_init(const char* nmea_tree_string);
 
 
 /************************************************************************************
