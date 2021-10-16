@@ -150,7 +150,7 @@ static portBASE_TYPE ps_cmd(char *pcWriteBuffer, size_t xWriteBufferLen, const c
  * "Task Status" command
  */
 static portBASE_TYPE task_stats_cmd(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString) {
-    const int8_t *const task_table_header = (int8_t *) "\r\nTask     \tState\tPri\tStack\t#\r\n*******************************************\r\n";
+    const int8_t *const task_table_header = (int8_t *) "\r\nTask     \tState\tPri\tstack\t#\r\n\t\t\t\t(free)\r\n*******************************************\r\n";
 
     configASSERT(pcWriteBuffer);
 
@@ -158,8 +158,7 @@ static portBASE_TYPE task_stats_cmd(char *pcWriteBuffer, size_t xWriteBufferLen,
     strcpy((char *) pcWriteBuffer, (char *) task_table_header);
     vTaskList(pcWriteBuffer + strlen((char *) task_table_header));
 
-    /* There is no more data to return after this single string, so return
-    pdFALSE. */
+    /* There is no more data to return after this single string, so return pdFALSE. */
     return pdFALSE;
 }
 
@@ -177,7 +176,6 @@ static portBASE_TYPE get_portmask_cmd(char *pcWriteBuffer, size_t xWriteBufferLe
     uint8_t portmask;
     int index = 0;
     int i;
-
     int port;
 
     configASSERT(pcWriteBuffer);
@@ -189,7 +187,6 @@ static portBASE_TYPE get_portmask_cmd(char *pcWriteBuffer, size_t xWriteBufferLe
         /* Check parameter */
         if (parameter_string != NULL) {
             port = atoi(parameter_string) - 1;
-//            printf("Port %d\r\n", port);
             if (port < 0 || port >= NMEA_PORT_TASK_NR_NMEA_PORTS) {
                 sprintf(pcWriteBuffer, "Unknown port (ports 1->%d)\r\n", NMEA_PORT_TASK_NR_NMEA_PORTS);
                 return pdFALSE;
@@ -198,12 +195,9 @@ static portBASE_TYPE get_portmask_cmd(char *pcWriteBuffer, size_t xWriteBufferLe
 
         // Allocate NMEA string buffer
         nmea_str_start = (char*)pvPortMalloc(1024);
-//      printf("get_portmask: nmea_str %p\r\n", nmea_str);
         nmea_str = nmea_str_start;
         nmea_tree_get_string(nmea_search_trees[port], nmea_str);
 
-//      printf("get_portmask_cmd first run\r\n");
-//      printf("nmea_str_node = %p\r\n", nmea_str_node);
         if (strlen(nmea_str) == 0) {
             if (port == 5) {
                 sprintf(pcWriteBuffer, "\n\rNMEA Port %d (BT) is not configured\r\n", port+1);
@@ -246,21 +240,16 @@ static portBASE_TYPE get_portmask_cmd(char *pcWriteBuffer, size_t xWriteBufferLe
     }
     nmea_str++;     // Skip ','
     portmask_str[2] = 0x00;
-//    printf("portmask_str %s\r\n", portmask_str);
-
     portmask = strtol(portmask_str, NULL, 16);
 
-//    printf("pcWriteBuffer: %s\r\n", nmea_type_str);
     sprintf(pcWriteBuffer, "%s 0x%.2X\r\n", nmea_type_str, portmask);
 
     if (*nmea_str == 0x00) {
-//        printf("Last\r\n");
         vPortFree(nmea_str_start);
         nmea_str_start = NULL;
         nmea_str = NULL;
         return pdFALSE;
     } else {
-//        printf("More\r\n");
         return pdPASS;
     }
 }

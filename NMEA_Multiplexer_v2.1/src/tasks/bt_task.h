@@ -19,7 +19,7 @@
 #define BT_TASK_PRIORITY		(tskIDLE_PRIORITY + 1)
 
 /* Task stack sizes */
-#define BT_TASK_STACK_SIZE	(1024)
+#define BT_TASK_STACK_SIZE	(configMINIMAL_STACK_SIZE * 2)
 
 #define BT_RX_BUFFER_SIZE	100
 

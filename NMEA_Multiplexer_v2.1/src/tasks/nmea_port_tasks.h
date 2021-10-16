@@ -29,13 +29,12 @@
 #define NMEA_PORT_TASK_USB_PORT 6
 
 /* Task priorities */
-#define NMEA_PORT_TASK_PRIORITY		(tskIDLE_PRIORITY + 1)
+#define NMEA_PORT_TASK_PRIORITY     (tskIDLE_PRIORITY + 1)
 
 /* Task stack sizes */
-//#define NMEA_PORT_TASK_STACK_SIZE	(configMINIMAL_STACK_SIZE * 3)
-#define NMEA_PORT_TASK_STACK_SIZE	(1024)
+#define NMEA_PORT_TASK_STACK_SIZE   (512)
 
-#define NMEA_PORT_RX_BUFFER_SIZE	100
+#define NMEA_PORT_RX_BUFFER_SIZE    100
 
 extern QueueHandle_t nmea_tx_queues[NMEA_PORT_TASK_NR_NMEA_PORTS];    // NMEA Tx Data queues
 

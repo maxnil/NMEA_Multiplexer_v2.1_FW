@@ -46,8 +46,6 @@ void create_bt_task() {
 static void bt_tx_task(void *pvParameters) {
 	char* tx_buffer;			// Temporary Tx Buffer pointer
     
-    printf("Hello from BT task\r\n");
-
 	for (;;) {
     	if (xQueueReceive(nmea_tx_queues[NMEA_PORT_TASK_BT_PORT], &tx_buffer, portMAX_DELAY) == pdTRUE) {
         	led_blink(LED_BT_TX, LED_SHORT_FLASH);

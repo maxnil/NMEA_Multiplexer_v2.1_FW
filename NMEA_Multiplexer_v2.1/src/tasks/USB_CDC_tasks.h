@@ -21,8 +21,8 @@
 #define CDC_NMEA_TASK_PRIORITY		(tskIDLE_PRIORITY + 1)
 
 /* Task stack sizes */
-#define CDC_CLI_TASK_STACK_SIZE		(4096)
-#define CDC_NMEA_TASK_STACK_SIZE	(2048)
+#define CDC_CLI_TASK_STACK_SIZE		(512)
+#define CDC_NMEA_TASK_STACK_SIZE	(configMINIMAL_STACK_SIZE)
 
 /* USB CDC Task creator */
 void create_usb_cdc_tasks(void);

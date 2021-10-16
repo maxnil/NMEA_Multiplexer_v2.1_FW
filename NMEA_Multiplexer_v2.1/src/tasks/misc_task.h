@@ -19,7 +19,7 @@
 #define MISC_TASK_PRIORITY		(tskIDLE_PRIORITY + 1)
 
 /* Task stack sizes */
-#define MISC_TASK_STACK_SIZE	(1024)
+#define MISC_TASK_STACK_SIZE	(configMINIMAL_STACK_SIZE)
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ FUNCTIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
