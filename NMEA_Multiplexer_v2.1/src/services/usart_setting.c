@@ -36,31 +36,21 @@ void init_nmea_port_usart(Usart *p_usart, int baudrate) {
     nmea_usart_opt.baudrate = baudrate;
     configASSERT(nmea_periph_opt.receive_buffer = (uint8_t*)pvPortMalloc(CONF_NMEA_MUX_NMEA_UARTS_RX_BUFFER_SIZE));
     configASSERT(freertos_usart_serial_init(p_usart, &nmea_usart_opt, &nmea_periph_opt));
-    printf("Setting NMEA USART %p to baudrate %d\n\r", p_usart, baudrate);
 }    
 
 void update_usart_baudrate_from_str(char* str) {
-    char* str_ptr;
-    
-    str_ptr = str;
-    
     /* Default settings */
     for (int i = 0; i < CONF_NMEA_MUX_NR_NMEA_UART_PORTS; i++) {
         usart_baudrate[i] = CONF_NMEA_MUX_NMEA_UARTS_BAUDRATE;
     }        
 
     for (int i = 0; i < CONF_NMEA_MUX_NR_NMEA_UART_PORTS; i++) {
-        if (*str_ptr < '0' || *str_ptr > '9') {
-            printf("USART baudrate char (%d) is not a number\n\r", *str_ptr);
+        if (*str < '0' || *str > '9') {
+            printf("### ERR: Baud rate for NMEA UART port %d is not valid\n\r", i + 1);
             break;
         }
-//        printf("1 before usart_str: %s\n\r", str_ptr);
-//        printf("2 before str_ptr = 0x%.8X\n\r", str_ptr);
-        usart_baudrate[i] = strtol(str_ptr, &str_ptr, 10);
-//        printf("3 after str_ptr2 = 0x%.8X\n\r", str_ptr);
-//        printf("4 usart_baudrate[%d] = %d\n\r", i, usart_baudrate[i]);
-        str_ptr++;  // Get rid of ','
-//        printf("5 after usart_str: %s\n\r", str_ptr);
+        usart_baudrate[i] = strtol(str, &str, 10);
+        str++;  // Get rid of ','
     }
 }
 

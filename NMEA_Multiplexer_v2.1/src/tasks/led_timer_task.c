@@ -88,7 +88,9 @@ static void LEDTimerCallback(TimerHandle_t xTimer) {
         if (led_on_cycles[led_nr] > 0) {
             led_on_cycles[led_nr]--;
         }
-    }                
+    }           
+    
+    wdt_restart(WDT); 
 }
 
 void create_led_timer_task() {

@@ -36,7 +36,7 @@
 
 //~~~~~~~~~~~~~~~~~~~~~~~~ LOCAL FUNCTION DECLARATIONS ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-static portBASE_TYPE get_version_cmd    (char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
+static portBASE_TYPE version_cmd        (char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
 static portBASE_TYPE mem_cmd            (char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
 static portBASE_TYPE cli_cmd            (char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
 static portBASE_TYPE ps_cmd             (char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
@@ -46,13 +46,15 @@ static portBASE_TYPE set_portmask_cmd   (char *pcWriteBuffer, size_t xWriteBuffe
 static portBASE_TYPE save_settings_cmd  (char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
 static portBASE_TYPE erase_flash_cmd    (char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
 static portBASE_TYPE reset_cmd          (char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
+static portBASE_TYPE reset_cause_cmd    (char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
 static portBASE_TYPE set_baudrate_cmd   (char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
 static portBASE_TYPE get_baudrate_cmd   (char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
+static portBASE_TYPE crash_cmd          (char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LOCAL VARIABLES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 /* CLI command definitions */
-CLI_Command_Definition_t get_version_cmd_def   = {"get_version",   "get_version\r\n",                 get_version_cmd,   0};
+CLI_Command_Definition_t version_cmd_def       = {"version",       "version\r\n",                     version_cmd,       0};
 CLI_Command_Definition_t mem_cmd_def           = {"mem",           "mem\r\n",                         mem_cmd,           0};
 CLI_Command_Definition_t cli_cmd_def           = {"cli",           "cli\r\n",                         cli_cmd,           0};
 CLI_Command_Definition_t ps_cmd_def            = {"ps",            "ps\r\n",                          ps_cmd,            0};
@@ -62,41 +64,95 @@ CLI_Command_Definition_t set_portmask_cmd_def  = {"set_portmask",  "set_portmask
 CLI_Command_Definition_t save_settings_cmd_def = {"save_settings", "save_settings\r\n",               save_settings_cmd, 0};
 CLI_Command_Definition_t erase_flash_cmd_def   = {"erase_flash",   "erase_flash\r\n",                 erase_flash_cmd,   0};
 CLI_Command_Definition_t reset_cmd_def         = {"reset",         "reset\r\n",                       reset_cmd,         0};
+CLI_Command_Definition_t reset_cause_cmd_def   = {"reset_cause",   "reset-cause\r\n",                 reset_cause_cmd,   0};
 CLI_Command_Definition_t set_baudrate_cmd_def  = {"set_baudrate",  "set_baudrate\r\n",                set_baudrate_cmd,  2};
 CLI_Command_Definition_t get_baudrate_cmd_def  = {"get_baudrate",  "get_baudrate\r\n",                get_baudrate_cmd,  0};
+CLI_Command_Definition_t crash_cmd_def         = {"crash",         "",                                crash_cmd,         0};
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ FUNCTIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 bool disable_usb_nmea = false;
+int uptime = 0;
 
 /*******************************************************************************
  * Registers all CLI commands
  */
 void vRegisterCLICommands() {
-    FreeRTOS_CLIRegisterCommand(&get_version_cmd_def);
-    FreeRTOS_CLIRegisterCommand(&mem_cmd_def);
+    FreeRTOS_CLIRegisterCommand(&version_cmd_def);
     FreeRTOS_CLIRegisterCommand(&cli_cmd_def);
+    FreeRTOS_CLIRegisterCommand(&mem_cmd_def);
     FreeRTOS_CLIRegisterCommand(&ps_cmd_def);
     FreeRTOS_CLIRegisterCommand(&task_stats_cmd_def);
+    FreeRTOS_CLIRegisterCommand(&get_baudrate_cmd_def);
+    FreeRTOS_CLIRegisterCommand(&set_baudrate_cmd_def);
     FreeRTOS_CLIRegisterCommand(&get_portmask_cmd_def);
     FreeRTOS_CLIRegisterCommand(&set_portmask_cmd_def);
     FreeRTOS_CLIRegisterCommand(&save_settings_cmd_def);
     FreeRTOS_CLIRegisterCommand(&erase_flash_cmd_def);
     FreeRTOS_CLIRegisterCommand(&reset_cmd_def);
-    FreeRTOS_CLIRegisterCommand(&set_baudrate_cmd_def);
-    FreeRTOS_CLIRegisterCommand(&get_baudrate_cmd_def);
+    FreeRTOS_CLIRegisterCommand(&reset_cause_cmd_def);
+    FreeRTOS_CLIRegisterCommand(&crash_cmd_def);  // This is not seen in the 'help' command
 }
 
 
 /*******************************************************************************
- * "Get Version" command
+ * "Version" command
  * Returns SW version
  */
-static portBASE_TYPE get_version_cmd(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString) {
+static portBASE_TYPE version_cmd(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString) {
     configASSERT(pcWriteBuffer);
 
     sprintf(pcWriteBuffer, "NMEA Multiplexer %s (%s, %s)\r\n", SW_VERSION, __DATE__, __TIME__);
+    return pdFALSE;
+}
 
+
+/*******************************************************************************
+ * "Crash" command
+ * Returns SW version
+ */
+static portBASE_TYPE crash_cmd(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString) {
+    printf("### WARN: System is deliberately crashed!\n\r");
+    taskENTER_CRITICAL();  // Freeze task switching
+    return pdFALSE;
+}
+
+
+/*******************************************************************************
+ * Reset-cause command
+ * Returns the reset cause
+ */
+static portBASE_TYPE reset_cause_cmd(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString) {
+    configASSERT(pcWriteBuffer);
+    
+    uint32_t reset_cause;
+    reset_cause = rstc_get_reset_cause(RSTC);
+    printf("Reset cause: ");
+    switch (reset_cause) {
+        case RSTC_SOFTWARE_RESET:
+            sprintf(pcWriteBuffer, "Reset cause: Software reset (Reset command)\r\n");
+            printf("SOFTWARE_RESET\n\r");
+            break;
+        case RSTC_BACKUP_RESET:
+            sprintf(pcWriteBuffer, "Reset cause: Backup reset\r\n");
+            printf("BACKUP_RESET\n\r");
+            break;
+        case RSTC_WATCHDOG_RESET:
+            sprintf(pcWriteBuffer, "Reset cause: Watchdog reset\r\n");
+            printf("WATCHDOG_RESET\n\r");
+            break;
+        case RSTC_GENERAL_RESET:
+            sprintf(pcWriteBuffer, "Reset cause: General reset (Power-On)\r\n");
+            printf("GENERAL_RESET\n\r");
+            break;
+        case RSTC_USER_RESET:
+            sprintf(pcWriteBuffer, "Reset cause: User reset (Reset button)\r\n");
+            printf("USER_RESET\n\r");
+            break;
+        default:
+            sprintf(pcWriteBuffer, "Reset cause: unknown\r\n");
+            printf("Unknown\n\r");
+    }    
     return pdFALSE;
 }
 
@@ -395,8 +451,7 @@ static portBASE_TYPE set_baudrate_cmd(char *pcWriteBuffer, size_t xWriteBufferLe
  
     sprintf(pcWriteBuffer, "\n\r\nNMEA Port %d baudrate set to %d\r\n", port+1, baudrate);
 
-    printf("NMEA Port %d baudrate %d\n\r", port, baudrate);
-//  sprintf(pcWriteBuffer, "%s 0x%.2X\r\n", temp_str, portmask);
+    printf("NMEA Port %d baudrate %d\n\r", port+1, baudrate);
 
     return pdFALSE;
 }

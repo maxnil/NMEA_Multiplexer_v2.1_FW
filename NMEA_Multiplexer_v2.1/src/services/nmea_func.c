@@ -180,7 +180,7 @@ nmea_node_t* nmea_tree_init(const char* nmea_tree_string) {
 int nmea_tree_add(nmea_node_t* curr_node, char* nmea_string, uint8_t port_mask) {
     nmea_node_t* new_node;
 
-    printf("Insert NMEA \'%s\' 0x%.2X %p\r\n", nmea_string, port_mask, curr_node);
+//    printf("Insert NMEA \'%s\' 0x%.2X %p\r\n", nmea_string, port_mask, curr_node);
 
     taskENTER_CRITICAL();
 
@@ -192,7 +192,7 @@ int nmea_tree_add(nmea_node_t* curr_node, char* nmea_string, uint8_t port_mask) 
             nmea_string++;
             // If the complete NMEA sentence already exists then replace port-mask
             if ((char)*nmea_string == 0x00 || (char)*nmea_string == ',') {
-                printf("Exists\n\r");
+//                printf("Exists\n\r");
                 curr_node->port_mask = port_mask;
                 taskEXIT_CRITICAL();
                 return 0;

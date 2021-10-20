@@ -11,6 +11,7 @@
 
 #define SW_VERSION "v2.1.0"
 
+#define CONF_NMEA_MUX_WATCHDOG_TIMEOUT_US 2000000
 
 #define DEBUG_L1
 

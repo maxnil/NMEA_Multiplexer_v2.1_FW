@@ -76,31 +76,63 @@ int main (void)
 #ifdef CONF_NMEA_MUX_DEBUG_UART_ENABLE
     /* Initialize Debug Console */
     const usart_serial_options_t console_uart_options = {
-        .baudrate     = CONF_UART_CONSOLE_BAUDRATE,
+        .baudrate   = CONF_UART_CONSOLE_BAUDRATE,
         .paritytype = CONF_UART_CONSOLE_PARITY,
         .charlength = CONF_UART_CONSOLE_CHAR_LENGTH,
-        .stopbits     = CONF_UART_CONSOLE_STOP_BITS
+        .stopbits   = CONF_UART_CONSOLE_STOP_BITS
     };
 
     stdio_serial_init(CONF_UART_CONSOLE, &console_uart_options);
     printf(DBG_WELCOME_HEADER);         // Print welcome message on Debug UART
-#endif
-
-#ifdef CONF_NMEA_MUX_NMEA_UARTS_ENABLE
-    char* br_str_ptr;
-    br_str_ptr = pvPortMalloc(FILE_MAX_SIZE);
     
-    printf("Read NMEA USART Port settings from flash\n\r");
-    storage_read_file(7, br_str_ptr);
-    update_usart_baudrate_from_str(br_str_ptr);
-        
-    for (int i = 0; i < 5; i++) {
-        printf("usart_baudrate[%d] = %d\n\r", i, usart_baudrate[i]);
+    uint32_t reset_cause;
+    reset_cause = rstc_get_reset_cause(RSTC);
+    printf("### INFO: Reset cause: ");
+    switch (reset_cause) {
+        case RSTC_GENERAL_RESET:
+            printf("GENERAL_RESET\n\r");
+            break;
+        case RSTC_BACKUP_RESET:
+            printf("BACKUP_RESET\n\r");
+            break;
+        case RSTC_WATCHDOG_RESET:
+            printf("WATCHDOG_RESET\n\r");
+            break;
+        case RSTC_SOFTWARE_RESET:
+            printf("SOFTWARE_RESET\n\r");
+            break;
+        case RSTC_USER_RESET:
+            printf("USER_RESET\n\r");
+            break;
+        default:
+            printf("Unknown reset cause\n\r");
     }
 
-    vPortFree(br_str_ptr);    
+#endif
 
+    char* file_str;
+    file_str = (char*)pvPortMalloc(FILE_MAX_SIZE);
+
+    printf("### INFO: Reading NMEA-Mux configuration from NVRAM\r\n");
+    for (int i = 0; i < NMEA_PORT_TASK_NR_NMEA_PORTS; i++) {
+        if (storage_read_file(i, file_str) > 0) {
+            printf(" Reading tree %d: %s\r\n", i, file_str);
+            nmea_search_trees[i] = nmea_tree_init(file_str);
+            } else {
+            nmea_search_trees[i] = nmea_tree_init("\0");
+        }
+    }
+
+    storage_read_file(7, file_str);
+    printf(" Reading NMEA UART baud rates\n\r");
+    update_usart_baudrate_from_str(file_str);
+    
+    vPortFree(file_str);
+
+#ifdef CONF_NMEA_MUX_NMEA_UARTS_ENABLE
+    printf("### INFO: Enabling NMEA ports\n\r");
     for (int i = 0; i < CONF_NMEA_MUX_NR_NMEA_UART_PORTS; i++) {
+        printf(" NMEA UART Port %d baud rate = %d\n\r", i + 1, usart_baudrate[i]);
         init_nmea_port_usart(p_usart_list[i], usart_baudrate[i]);
     }        
 #endif
@@ -129,20 +161,6 @@ int main (void)
     configASSERT(bt_periph_opt.receive_buffer = (uint8_t*)pvPortMalloc(CONF_NMEA_MUX_BT_UART_RX_BUFFER_SIZE));
     configASSERT(freertos_usart_serial_init(CONF_UART_BT, &bt_usart_opt, &bt_periph_opt));
 #endif
-
-    char* nmea_str;
-    nmea_str = (char*)pvPortMalloc(FILE_MAX_SIZE);
-
-    printf("Reading NMEA configuration from NVRAM\r\n");
-    for (int i = 0; i < NMEA_PORT_TASK_NR_NMEA_PORTS; i++) {
-        if (storage_read_file(i, nmea_str) > 0) {
-            printf("Reading tree %d: %s\r\n", i, nmea_str);
-            nmea_search_trees[i] = nmea_tree_init(nmea_str);
-        } else {
-            nmea_search_trees[i] = nmea_tree_init("\0");
-        }
-    }        
-    vPortFree(nmea_str);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Create tasks
@@ -189,7 +207,14 @@ int main (void)
 #endif
 
 
-    printf("Starting all RTOS tasks\r\n");
+    /* Initialize Watch Dog */
+    uint32_t timeout_value;
+    uint32_t wdt_mode;
+    wdt_mode = WDT_MR_WDRSTEN; // | WDT_MR_WDRPROC;
+    timeout_value = wdt_get_timeout_value(CONF_NMEA_MUX_WATCHDOG_TIMEOUT_US, BOARD_FREQ_SLCK_XTAL);
+    wdt_init(WDT, wdt_mode, timeout_value, timeout_value);
+    
+    printf("### INFO: Starting all RTOS tasks\r\n");
     vTaskStartScheduler();  // This function call should never return
 
     printf("###ERROR: vTaskStartScheduler() failed\r\n");

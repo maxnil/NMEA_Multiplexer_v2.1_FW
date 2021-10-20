@@ -25,7 +25,7 @@
 
 void board_init(void)
 {
-	WDT->WDT_MR = WDT_MR_WDDIS;                         // disable watchdog
+//	WDT->WDT_MR = WDT_MR_WDDIS;                         // disable watchdog
 
 	ioport_init();                                      // call before using IOPORT service
 	delay_init(BOARD_MCK);

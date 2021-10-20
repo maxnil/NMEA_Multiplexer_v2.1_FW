@@ -48,7 +48,6 @@ void create_nmea_port_tasks() {
     /* Initialize the Tx data queues */
     for (int i = 0; i < NMEA_PORT_TASK_NR_NMEA_PORTS; i++) {
         nmea_tx_queues[i] = xQueueCreate(CONF_NMEA_MUX_NMEA_TX_QUEUE_SIZE, sizeof(uint8_t*));
-        printf("nmea_tx_queues[%d] = 0x%p\r\n", i, nmea_tx_queues[i]);
     }
     
     /* NMEA Port  Rx and Tx tasks */
